@@ -1,0 +1,262 @@
+{
+  "meta": {
+    "analysis_date": "2026-06-18",
+    "data_reference": "2024년 기준",
+    "sources": [
+      "건축물대장 (건축HUB, 2024년)",
+      "연속지적도 LSMD_CONT_LDREG_41135/28260_202606",
+      "VWorld 토지이용계획정보 (2026년 6월)",
+      "subway_network.zip (2026-05-05 export, 2024년 기준 필터)",
+      "SGIS 집계구 단위 인구·가구 (2025년2분기기준_2024년)"
+    ]
+  },
+  "zone": {
+    "pangyo": {
+      "name": "판교테크노밸리",
+      "dong": "삼평동",
+      "dong_code": "4113510900",
+      "area_km2": 2.7947,
+      "parcel_count": 421,
+      "source": "연속지적도 LSMD_CONT_LDREG_41135_202606 (2026년 6월 기준)",
+      "definition": "경기도 성남시 분당구 삼평동 법정동 경계 (판교테크노밸리 핵심 업무·연구지구)",
+      "core_station": "판교역(신분당선)",
+      "core_station_node": 824
+    },
+    "cheongna": {
+      "name": "청라국제업무지구",
+      "dong": "청라동",
+      "dong_code": "2826012200",
+      "area_km2": 20.7405,
+      "parcel_count": 3941,
+      "source": "연속지적도 LSMD_CONT_LDREG_28260_202606 (2026년 6월 기준)",
+      "definition": "인천광역시 서구 청라동 법정동 경계 (인천경제자유구역(IFEZ) 청라지구)",
+      "core_station": "청라국제도시역(공항철도)",
+      "core_station_node": 313
+    }
+  },
+  "land_use_buildings": {
+    "pangyo": {
+      "label": "판교테크노밸리(삼평동)",
+      "building_count": 285,
+      "total_gfa_m2": 4159660.67,
+      "use_ratio_pct": {
+        "공장·창고": 0.01,
+        "교육연구시설": 22.03,
+        "근린생활시설": 2.26,
+        "기타": 6.04,
+        "업무시설": 47.86,
+        "주거": 21.8
+      },
+      "lum_entropy": 0.7111,
+      "avg_far_pct": 136.68
+    },
+    "cheongna": {
+      "label": "청라국제업무지구(청라동)",
+      "building_count": 2497,
+      "total_gfa_m2": 8839058.06,
+      "use_ratio_pct": {
+        "공장·창고": 8.51,
+        "교육연구시설": 4.72,
+        "근린생활시설": 6.99,
+        "기타": 8.21,
+        "업무시설": 19.8,
+        "운수시설": 0.02,
+        "주거": 49.4,
+        "판매시설": 2.36
+      },
+      "lum_entropy": 0.7233,
+      "avg_far_pct": 91.39
+    },
+    "category_colors": {
+      "업무시설": "#2166ac",
+      "교육연구시설": "#4dac26",
+      "근린생활시설": "#f4a582",
+      "주거": "#d6604d",
+      "판매시설": "#fdae61",
+      "운수시설": "#bababa",
+      "공장·창고": "#762a83",
+      "기타": "#cccccc"
+    }
+  },
+  "transport": {
+    "pangyo": {
+      "core_station": "판교역(신분당선)",
+      "isochrone_30min_stations": 86,
+      "isochrone_60min_stations": 454
+    },
+    "cheongna": {
+      "core_station": "청라국제도시역(공항철도)",
+      "isochrone_30min_stations": 47,
+      "isochrone_60min_stations": 301
+    },
+    "comparison": {
+      "ratio_30min": 1.83,
+      "ratio_60min": 1.51
+    }
+  },
+  "demographics": {
+    "note": "집계구 shapefile 없어 행정구역(성남시/인천 서구) 단위 집계. 삼평동·청라동 단독 집계 불가.",
+    "seongnam_city_pop": 1436770,
+    "seogu_incheon_pop": 1268132,
+    "seongnam_city_households": 284152,
+    "seogu_incheon_households": 254766
+  },
+  "accessibility_curve": {
+    "pangyo": [
+      {
+        "time_min": 0,
+        "station_count": 1
+      },
+      {
+        "time_min": 5,
+        "station_count": 2
+      },
+      {
+        "time_min": 10,
+        "station_count": 7
+      },
+      {
+        "time_min": 15,
+        "station_count": 17
+      },
+      {
+        "time_min": 20,
+        "station_count": 26
+      },
+      {
+        "time_min": 25,
+        "station_count": 51
+      },
+      {
+        "time_min": 30,
+        "station_count": 86
+      },
+      {
+        "time_min": 35,
+        "station_count": 125
+      },
+      {
+        "time_min": 40,
+        "station_count": 170
+      },
+      {
+        "time_min": 45,
+        "station_count": 241
+      },
+      {
+        "time_min": 50,
+        "station_count": 336
+      },
+      {
+        "time_min": 55,
+        "station_count": 393
+      },
+      {
+        "time_min": 60,
+        "station_count": 454
+      },
+      {
+        "time_min": 65,
+        "station_count": 454
+      },
+      {
+        "time_min": 70,
+        "station_count": 454
+      },
+      {
+        "time_min": 75,
+        "station_count": 454
+      },
+      {
+        "time_min": 80,
+        "station_count": 454
+      },
+      {
+        "time_min": 85,
+        "station_count": 454
+      },
+      {
+        "time_min": 90,
+        "station_count": 454
+      }
+    ],
+    "cheongna": [
+      {
+        "time_min": 0,
+        "station_count": 1
+      },
+      {
+        "time_min": 5,
+        "station_count": 2
+      },
+      {
+        "time_min": 10,
+        "station_count": 3
+      },
+      {
+        "time_min": 15,
+        "station_count": 7
+      },
+      {
+        "time_min": 20,
+        "station_count": 17
+      },
+      {
+        "time_min": 25,
+        "station_count": 29
+      },
+      {
+        "time_min": 30,
+        "station_count": 47
+      },
+      {
+        "time_min": 35,
+        "station_count": 62
+      },
+      {
+        "time_min": 40,
+        "station_count": 85
+      },
+      {
+        "time_min": 45,
+        "station_count": 127
+      },
+      {
+        "time_min": 50,
+        "station_count": 191
+      },
+      {
+        "time_min": 55,
+        "station_count": 244
+      },
+      {
+        "time_min": 60,
+        "station_count": 301
+      },
+      {
+        "time_min": 65,
+        "station_count": 301
+      },
+      {
+        "time_min": 70,
+        "station_count": 301
+      },
+      {
+        "time_min": 75,
+        "station_count": 301
+      },
+      {
+        "time_min": 80,
+        "station_count": 301
+      },
+      {
+        "time_min": 85,
+        "station_count": 301
+      },
+      {
+        "time_min": 90,
+        "station_count": 301
+      }
+    ]
+  }
+}

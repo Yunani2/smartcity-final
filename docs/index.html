@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>업무지구 성공과 실패 — 판교테크노밸리 vs 청라국제업무지구</title>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+/* ── 기본 ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Malgun Gothic','맑은 고딕',sans-serif; font-size: 14px; background:#f4f6f9; color:#222; }
+a { color:#2166ac; }
+
+/* ── 헤더 ── */
+header {
+  background: linear-gradient(135deg,#1a3a5c 0%,#2166ac 100%);
+  color:#fff; padding:16px 24px;
+}
+header h1 { font-size:20px; margin-bottom:4px; }
+header p  { font-size:12px; opacity:.85; }
+
+/* ── 탭 ── */
+.tabs { display:flex; background:#fff; border-bottom:2px solid #2166ac; }
+.tab-btn {
+  padding:10px 24px; cursor:pointer; border:none; background:none;
+  font-size:14px; color:#555; transition:all .2s;
+}
+.tab-btn.active { color:#2166ac; font-weight:700; border-bottom:3px solid #2166ac; }
+.tab-btn:hover  { background:#f0f5ff; }
+
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* ── 범례 배지 ── */
+.legend-row { display:flex; flex-wrap:wrap; gap:10px; padding:10px 16px; background:#fff; border-bottom:1px solid #e0e0e0; }
+.legend-item { display:flex; align-items:center; gap:5px; font-size:12px; }
+.legend-dot  { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+
+/* ── 지도 패널 ── */
+.map-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 16px; background:#fff; border-bottom:1px solid #ddd; }
+.map-controls label { font-size:13px; display:flex; align-items:center; gap:4px; cursor:pointer; }
+.map-controls select { font-size:13px; padding:3px 6px; border:1px solid #ccc; border-radius:4px; }
+
+.maps-container { display:grid; grid-template-columns:1fr 1fr; gap:4px; height:calc(100vh - 220px); min-height:450px; }
+.map-wrapper { position:relative; }
+.map-label {
+  position:absolute; top:10px; left:50%; transform:translateX(-50%);
+  z-index:1000; background:rgba(26,58,92,.85); color:#fff;
+  padding:4px 12px; border-radius:12px; font-size:13px; font-weight:700;
+  pointer-events:none;
+}
+.map-div { width:100%; height:100%; }
+#map-pangyo  { height:100%; }
+#map-cheongna { height:100%; }
+
+/* ── 팝업 ── */
+.leaflet-popup-content { font-size:13px; min-width:160px; }
+.popup-title { font-weight:700; margin-bottom:6px; color:#1a3a5c; }
+.popup-row   { display:flex; justify-content:space-between; gap:8px; }
+.popup-label { color:#666; }
+.popup-val   { font-weight:600; }
+
+/* ── 통계 패널 ── */
+.stats-panel { padding:20px; max-width:1200px; margin:0 auto; }
+.stats-grid  { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+.stat-card   { background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,.1); }
+.stat-card h3 { font-size:14px; color:#1a3a5c; margin-bottom:12px; border-bottom:1px solid #e8eef7; padding-bottom:6px; }
+.chart-wrap  { position:relative; height:220px; }
+.kpi-grid    { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.kpi-box     { text-align:center; padding:10px; border-radius:6px; }
+.kpi-box.p  { background:#e8f2fc; }
+.kpi-box.c  { background:#fde8e8; }
+.kpi-label  { font-size:11px; color:#666; margin-bottom:4px; }
+.kpi-value  { font-size:18px; font-weight:700; }
+.kpi-box.p .kpi-value { color:#2166ac; }
+.kpi-box.c .kpi-value { color:#c0392b; }
+.kpi-sub    { font-size:11px; color:#888; }
+
+/* ── 비교표 ── */
+.compare-table { width:100%; border-collapse:collapse; font-size:13px; }
+.compare-table th { background:#eef3f9; color:#1a3a5c; padding:8px; text-align:left; }
+.compare-table td { padding:7px 8px; border-bottom:1px solid #f0f0f0; }
+.compare-table tr:hover td { background:#f7f9fc; }
+.badge-p { background:#2166ac; color:#fff; padding:1px 6px; border-radius:4px; font-size:11px; }
+.badge-c { background:#c0392b; color:#fff; padding:1px 6px; border-radius:4px; font-size:11px; }
+
+/* ── 접근성 패널 ── */
+.access-panel { padding:20px; max-width:1200px; margin:0 auto; }
+.access-grid  { display:grid; grid-template-columns:2fr 1fr; gap:20px; }
+@media(max-width:700px) { .access-grid { grid-template-columns:1fr; } .maps-container { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>데이터로 진단하는 업무지구의 성공과 실패</h1>
+  <p>판교테크노밸리(경기도 성남시 분당구 삼평동) vs 청라국제업무지구(인천광역시 서구 청라동) — 2024년 기준 공공데이터 비교분석</p>
+</header>
+
+<!-- 탭 -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="map">🗺️ 지도 비교</button>
+  <button class="tab-btn" data-tab="stats">📊 통계 패널</button>
+  <button class="tab-btn" data-tab="access">🚇 교통 접근성</button>
+</div>
+
+<!-- ═══ 지도 탭 ═══ -->
+<div class="tab-panel active" id="tab-map">
+  <!-- 범례 -->
+  <div class="legend-row" id="use-legend"></div>
+
+  <!-- 컨트롤 -->
+  <div class="map-controls">
+    <strong style="margin-right:4px">레이어:</strong>
+    <label><input type="checkbox" id="chk-zone" checked> 구역경계</label>
+    <label><input type="checkbox" id="chk-bldg" checked> 건축물 용도</label>
+    <label><input type="checkbox" id="chk-iso30"> 등시간권 30분</label>
+    <label><input type="checkbox" id="chk-iso60"> 등시간권 60분</label>
+    <label><input type="checkbox" id="chk-station"> 도달 지하철역</label>
+    <span style="margin-left:auto;font-size:12px;color:#888">베이스맵: OpenStreetMap</span>
+  </div>
+
+  <!-- 지도 -->
+  <div class="maps-container">
+    <div class="map-wrapper">
+      <div class="map-label">🏢 판교테크노밸리</div>
+      <div id="map-pangyo" class="map-div"></div>
+    </div>
+    <div class="map-wrapper">
+      <div class="map-label">🏗️ 청라국제업무지구</div>
+      <div id="map-cheongna" class="map-div"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 통계 탭 ═══ -->
+<div class="tab-panel" id="tab-stats">
+<div class="stats-panel">
+
+  <!-- KPI 요약 -->
+  <div class="stat-card" style="margin-bottom:20px">
+    <h3>핵심 지표 비교</h3>
+    <table class="compare-table" id="kpi-table">
+      <thead><tr><th>지표</th><th><span class="badge-p">판교테크노밸리</span></th><th><span class="badge-c">청라국제업무지구</span></th><th>비고</th></tr></thead>
+      <tbody id="kpi-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="stats-grid">
+    <!-- 건축물 주용도 파이 -->
+    <div class="stat-card">
+      <h3>건축물 주용도 구성비 (연면적 기준)</h3>
+      <div class="chart-wrap"><canvas id="pie-pangyo"></canvas></div>
+      <p style="text-align:center;font-size:12px;color:#666;margin-top:6px"><span class="badge-p">판교테크노밸리</span></p>
+    </div>
+    <div class="stat-card">
+      <h3>건축물 주용도 구성비 (연면적 기준)</h3>
+      <div class="chart-wrap"><canvas id="pie-cheongna"></canvas></div>
+      <p style="text-align:center;font-size:12px;color:#666;margin-top:6px"><span class="badge-c">청라국제업무지구</span></p>
+    </div>
+
+    <!-- 주요 지표 막대 -->
+    <div class="stat-card" style="grid-column:span 2">
+      <h3>주요 지표 나란히 비교</h3>
+      <div class="chart-wrap" style="height:280px"><canvas id="bar-compare"></canvas></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ 접근성 탭 ═══ -->
+<div class="tab-panel" id="tab-access">
+<div class="access-panel">
+  <div class="access-grid">
+    <div class="stat-card">
+      <h3>누적 접근성 곡선 — 역 수 기준 (출발역에서 t분 이내 도달 역 수)</h3>
+      <div class="chart-wrap" style="height:320px"><canvas id="line-access"></canvas></div>
+      <p style="font-size:12px;color:#888;margin-top:8px">
+        판교역(신분당선) vs 청라국제도시역(공항철도) 기준. 환승 대기시간 포함.
+        집계구 shapefile 미확보로 인구 기준 전환 불가 — 역 수 기준 제시.
+      </p>
+    </div>
+    <div>
+      <div class="stat-card" style="margin-bottom:16px">
+        <h3>등시간권 역수 비교</h3>
+        <div class="chart-wrap" style="height:180px"><canvas id="bar-iso"></canvas></div>
+      </div>
+      <div class="stat-card">
+        <h3>핵심역 정보</h3>
+        <table class="compare-table">
+          <tr><th></th><th><span class="badge-p">판교</span></th><th><span class="badge-c">청라</span></th></tr>
+          <tr><td>핵심역</td><td>판교역</td><td>청라국제도시역</td></tr>
+          <tr><td>노선</td><td>신분당선</td><td>공항철도(AREX)</td></tr>
+          <tr><td>개통</td><td>2011-10-28</td><td>2014-06-21</td></tr>
+          <tr><td>강남역까지</td><td>~15분</td><td>~50분(환승)</td></tr>
+          <tr><td>서울역까지</td><td>~35분</td><td>~35분</td></tr>
+        </table>
+        <p style="font-size:11px;color:#888;margin-top:8px">
+          공항철도는 서울역 방향이 주 노선으로, 강남·여의도 방향 접근성 불리.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/charts.js"></script>
+
+<script>
+// ── 탭 전환 ──────────────────────────────────────────────────────────
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    // 지도 탭으로 돌아올 때 크기 재조정
+    if (btn.dataset.tab === "map" && window.mapPangyo) {
+      setTimeout(() => { window.mapPangyo.invalidateSize(); window.mapCheongna.invalidateSize(); }, 50);
+    }
+  });
+});
+</script>
+</body>
+</html>

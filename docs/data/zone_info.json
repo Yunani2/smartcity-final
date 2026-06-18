@@ -1,0 +1,20 @@
+{
+  "pangyo": {
+    "name": "판교테크노밸리",
+    "dong": "삼평동",
+    "dong_code": "4113510900",
+    "area_km2": 2.7947,
+    "parcel_count": 421,
+    "source": "연속지적도 LSMD_CONT_LDREG_41135_202606 (2026년 6월 기준)",
+    "definition": "경기도 성남시 분당구 삼평동 법정동 경계 (판교테크노밸리 핵심 업무·연구지구)"
+  },
+  "cheongna": {
+    "name": "청라국제업무지구",
+    "dong": "청라동",
+    "dong_code": "2826012200",
+    "area_km2": 20.7405,
+    "parcel_count": 3941,
+    "source": "연속지적도 LSMD_CONT_LDREG_28260_202606 (2026년 6월 기준)",
+    "definition": "인천광역시 서구 청라동 법정동 경계 (인천경제자유구역(IFEZ) 청라지구)"
+  }
+}
