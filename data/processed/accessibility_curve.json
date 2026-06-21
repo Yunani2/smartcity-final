@@ -1,0 +1,168 @@
+{
+  "pangyo": {
+    "label": "판교역(신분당선)",
+    "curve": [
+      {
+        "time_min": 0,
+        "station_count": 1
+      },
+      {
+        "time_min": 5,
+        "station_count": 2
+      },
+      {
+        "time_min": 10,
+        "station_count": 7
+      },
+      {
+        "time_min": 15,
+        "station_count": 17
+      },
+      {
+        "time_min": 20,
+        "station_count": 26
+      },
+      {
+        "time_min": 25,
+        "station_count": 51
+      },
+      {
+        "time_min": 30,
+        "station_count": 86
+      },
+      {
+        "time_min": 35,
+        "station_count": 125
+      },
+      {
+        "time_min": 40,
+        "station_count": 170
+      },
+      {
+        "time_min": 45,
+        "station_count": 241
+      },
+      {
+        "time_min": 50,
+        "station_count": 336
+      },
+      {
+        "time_min": 55,
+        "station_count": 393
+      },
+      {
+        "time_min": 60,
+        "station_count": 454
+      },
+      {
+        "time_min": 65,
+        "station_count": 454
+      },
+      {
+        "time_min": 70,
+        "station_count": 454
+      },
+      {
+        "time_min": 75,
+        "station_count": 454
+      },
+      {
+        "time_min": 80,
+        "station_count": 454
+      },
+      {
+        "time_min": 85,
+        "station_count": 454
+      },
+      {
+        "time_min": 90,
+        "station_count": 454
+      }
+    ]
+  },
+  "cheongna": {
+    "label": "청라국제도시역(공항철도)",
+    "curve": [
+      {
+        "time_min": 0,
+        "station_count": 1
+      },
+      {
+        "time_min": 5,
+        "station_count": 2
+      },
+      {
+        "time_min": 10,
+        "station_count": 3
+      },
+      {
+        "time_min": 15,
+        "station_count": 7
+      },
+      {
+        "time_min": 20,
+        "station_count": 17
+      },
+      {
+        "time_min": 25,
+        "station_count": 29
+      },
+      {
+        "time_min": 30,
+        "station_count": 47
+      },
+      {
+        "time_min": 35,
+        "station_count": 62
+      },
+      {
+        "time_min": 40,
+        "station_count": 85
+      },
+      {
+        "time_min": 45,
+        "station_count": 127
+      },
+      {
+        "time_min": 50,
+        "station_count": 191
+      },
+      {
+        "time_min": 55,
+        "station_count": 244
+      },
+      {
+        "time_min": 60,
+        "station_count": 301
+      },
+      {
+        "time_min": 65,
+        "station_count": 301
+      },
+      {
+        "time_min": 70,
+        "station_count": 301
+      },
+      {
+        "time_min": 75,
+        "station_count": 301
+      },
+      {
+        "time_min": 80,
+        "station_count": 301
+      },
+      {
+        "time_min": 85,
+        "station_count": 301
+      },
+      {
+        "time_min": 90,
+        "station_count": 301
+      }
+    ]
+  },
+  "note": "station_count는 역 수 기준. 집계구 SHP 연동 시 인구 기준으로 교체 가능.",
+  "analysis_cutoff": "2024-12-31",
+  "pangyo_node": 824,
+  "cheongna_node": 313
+}

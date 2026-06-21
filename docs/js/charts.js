@@ -10,7 +10,7 @@ async function initCharts() {
 
   // ── KPI 비교표 ────────────────────────────────────────────────────
   const kpiData = [
-    ["구역 면적", stats.zone.pangyo.area_km2 + " km²", stats.zone.cheongna.area_km2 + " km²", "삼평동·청라동 법정동 기준"],
+    ["구역 면적", stats.zone.pangyo.area_km2 + " km²", stats.zone.cheongna.area_km2 + " km²", "PROM 구역계 직접 설정"],
     ["건축물 수", p.building_count.toLocaleString() + "동", c.building_count.toLocaleString() + "동", "주건축물 기준"],
     ["총 연면적", (p.total_gfa_m2/1e6).toFixed(2) + " 백만㎡", (c.total_gfa_m2/1e6).toFixed(2) + " 백만㎡", ""],
     ["업무시설 연면적 비율", (p.use_ratio_pct["업무시설"]||0).toFixed(1) + "%",
@@ -93,7 +93,7 @@ async function initCharts() {
         tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toFixed(1)}%` } }
       },
       scales: {
-        y: { title: { display: true, text: "연면적 비율 (%)" }, beginAtZero: true, max: 60 },
+        y: { title: { display: true, text: "연면적 비율 (%)" }, beginAtZero: true, max: 75 },
         x: { title: { display: true, text: "건축물 주용도" } }
       }
     }

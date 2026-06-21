@@ -39,14 +39,14 @@ function makeMap(divId, center, zoom) {
 function bldgPopup(feat) {
   const p = feat.properties;
   const rows = [
-    ["건물명",     p["건물명"] || "-"],
-    ["주용도",     p["주용도코드명"] || "-"],
-    ["용도분류",   p["용도분류"] || "-"],
-    ["대지면적",   p["대지면적(㎡)"] ? p["대지면적(㎡)"].toLocaleString() + " ㎡" : "-"],
-    ["연면적",     p["연면적(㎡)"]   ? p["연면적(㎡)"].toLocaleString()   + " ㎡" : "-"],
-    ["용적률",     p["용적률(%)"]    ? p["용적률(%)"].toFixed(1)          + " %" : "-"],
-    ["지상층수",   p["지상층수"] ? p["지상층수"] + "층" : "-"],
-    ["사용승인일", p["사용승인일"] || "-"],
+    ["건물명",     p["bd_nm"] || "-"],
+    ["주용도",     p["mn_use_nm"] || "-"],
+    ["용도분류",   p["use_class"] || "-"],
+    ["대지면적",   p["land_ar"] ? Number(p["land_ar"]).toLocaleString() + " ㎡" : "-"],
+    ["연면적",     p["tot_fl_ar"] ? Number(p["tot_fl_ar"]).toLocaleString() + " ㎡" : "-"],
+    ["용적률",     p["fl_ar_ratio"] ? Number(p["fl_ar_ratio"]).toFixed(1) + " %" : "-"],
+    ["지상층수",   p["gr_fl_num"] ? p["gr_fl_num"] + "층" : "-"],
+    ["사용승인일", p["use_per_dt"] || "-"],
   ];
   const rowsHtml = rows.map(([l, v]) =>
     `<div class="popup-row"><span class="popup-label">${l}</span><span class="popup-val">${v}</span></div>`
@@ -63,8 +63,8 @@ async function loadGeoJSON(url) {
 /* ── 메인 초기화 ── */
 async function initMaps() {
   // 지도 생성
-  const mapP = L.map("map-pangyo",  { zoomControl:true }).setView([37.395, 127.111], 14);
-  const mapC = L.map("map-cheongna",{ zoomControl:true }).setView([37.555, 126.630], 14);
+  const mapP = L.map("map-pangyo",  { zoomControl:true }).setView([37.404, 127.105], 15);
+  const mapC = L.map("map-cheongna",{ zoomControl:true }).setView([37.533, 126.625], 15);
   window.mapPangyo   = mapP;
   window.mapCheongna = mapC;
 
@@ -101,7 +101,7 @@ async function initMaps() {
 
   // ── 건축물 레이어 ──
   function bldgStyle(feat) {
-    const cat = feat.properties["용도분류"] || "기타";
+    const cat = feat.properties["use_class"] || "기타";
     return { radius: 5, fillColor: USE_COLORS[cat] || "#ccc", color:"#fff",
              weight:0.5, fillOpacity:0.85 };
   }
@@ -143,7 +143,7 @@ async function initMaps() {
   L.marker([37.3946, 127.1112], { icon: iconStar })
     .bindPopup("<b>판교역 (신분당선)</b><br>핵심역 — 강남역까지 ~15분")
     .addTo(mapP);
-  L.marker([37.5565, 126.6246], { icon: iconStar })
+  L.marker([37.5330, 126.6231], { icon: iconStar })
     .bindPopup("<b>청라국제도시역 (공항철도)</b><br>핵심역 — 개통 2014-06-21")
     .addTo(mapC);
 

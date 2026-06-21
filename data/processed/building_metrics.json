@@ -1,0 +1,36 @@
+{
+  "pangyo": {
+    "label": "판교테크노밸리",
+    "building_count": 83,
+    "total_gfa_m2": 2619692.0,
+    "use_ratio_pct": {
+      "업무시설": 66.2,
+      "교육연구시설": 29.9,
+      "기타": 4.0
+    },
+    "lum_entropy": 0.6937,
+    "avg_far_pct": 276.51
+  },
+  "cheongna": {
+    "label": "청라국제업무지구",
+    "building_count": 14,
+    "total_gfa_m2": 315593.0,
+    "use_ratio_pct": {
+      "업무시설": 65.3,
+      "근린생활시설": 22.4,
+      "기타": 12.3
+    },
+    "lum_entropy": 0.7929,
+    "avg_far_pct": 491.05
+  },
+  "category_colors": {
+    "업무시설": "#2166ac",
+    "교육연구시설": "#4dac26",
+    "근린생활시설": "#f4a582",
+    "주거": "#d6604d",
+    "판매시설": "#fdae61",
+    "운수시설": "#bababa",
+    "공장·창고": "#762a83",
+    "기타": "#cccccc"
+  }
+}
