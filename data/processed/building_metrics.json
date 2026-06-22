@@ -12,16 +12,19 @@
     "avg_far_pct": 276.51
   },
   "cheongna": {
-    "label": "청라국제업무지구",
-    "building_count": 14,
-    "total_gfa_m2": 315593.0,
+    "label": "청라국제업무지구(수정)",
+    "building_count": 552,
+    "total_gfa_m2": 1370984.95,
     "use_ratio_pct": {
-      "업무시설": 65.3,
-      "근린생활시설": 22.4,
-      "기타": 12.3
+      "교육연구시설": 8.75,
+      "근린생활시설": 7.09,
+      "기타": 3.77,
+      "업무시설": 17.97,
+      "운수시설": 0.14,
+      "주거": 62.29
     },
-    "lum_entropy": 0.7929,
-    "avg_far_pct": 491.05
+    "lum_entropy": 0.6343,
+    "avg_far_pct": 97.21
   },
   "category_colors": {
     "업무시설": "#2166ac",

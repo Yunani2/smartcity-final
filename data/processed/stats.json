@@ -18,18 +18,28 @@
       "total_fa_m2": 2619692.0,
       "source": "국가공간정보포털 PROM 다운로드 (2026년 6월 기준), 구역계 직접 설정",
       "definition": "경기도 성남시 분당구 판교테크노밸리 제1단지 사업지구 경계 (PROM 구역계 직접 설정)",
-      "bounds": [127.09709510774479, 37.39989971565941, 127.11284065970858, 37.40743665068185],
+      "bounds": [
+        127.09709510774479,
+        37.39989971565941,
+        127.11284065970858,
+        37.40743665068185
+      ],
       "core_station": "판교역(신분당선)",
       "core_station_node": 824
     },
     "cheongna": {
       "name": "청라국제업무지구",
-      "area_km2": 0.9058,
-      "bld_count": 14,
-      "total_fa_m2": 315593.0,
-      "source": "국가공간정보포털 PROM 다운로드 (2026년 6월 기준), 구역계 직접 설정",
-      "definition": "인천광역시 서구 청라국제업무지구(IBC) 경계 (PROM 구역계 직접 설정)",
-      "bounds": [126.61856953214169, 37.52808044641134, 126.63171942767147, 37.53771514564544],
+      "area_km2": 9.8595,
+      "bld_count": 552,
+      "total_fa_m2": 1370984.95,
+      "source": "공간정보 오픈플랫폼(PROM) 구역계 직접 설정 (2026년 6월)",
+      "definition": "인천경제자유구역 청라지구 청라 호수공원 중심 좌측 업무·상업·주거 복합지구",
+      "bounds": [
+        126.60246347130918,
+        37.51108260162569,
+        126.63725838169454,
+        37.558211459217866
+      ],
       "core_station": "청라국제도시역(공항철도)",
       "core_station_node": 313
     }
@@ -49,15 +59,18 @@
     },
     "cheongna": {
       "label": "청라국제업무지구",
-      "building_count": 14,
-      "total_gfa_m2": 315593.0,
+      "building_count": 552,
+      "total_gfa_m2": 1370984.95,
       "use_ratio_pct": {
-        "업무시설": 65.3,
-        "근린생활시설": 22.4,
-        "기타": 12.3
+        "교육연구시설": 8.75,
+        "근린생활시설": 7.09,
+        "기타": 3.77,
+        "업무시설": 17.97,
+        "운수시설": 0.14,
+        "주거": 62.29
       },
-      "lum_entropy": 0.7929,
-      "avg_far_pct": 491.05
+      "lum_entropy": 0.6343,
+      "avg_far_pct": 97.21
     },
     "category_colors": {
       "업무시설": "#2166ac",
@@ -250,5 +263,97 @@
         "station_count": 301
       }
     ]
+  },
+  "road": {
+    "pangyo": {
+      "drive_length_km": 13.21,
+      "drive_density_km_km2": 13.73,
+      "walk_length_km": 24.74,
+      "walk_density_km_km2": 25.71,
+      "n_intersections": 34,
+      "n_road_segments": 85
+    },
+    "cheongna": {
+      "drive_length_km": 97.9,
+      "drive_density_km_km2": 9.93,
+      "walk_length_km": 224.83,
+      "walk_density_km_km2": 22.8,
+      "n_intersections": 217,
+      "n_road_segments": 506
+    }
+  },
+  "sociodemographics": {
+    "note": "집계구 경계 SHP 미보유로 구역 내 정밀 집계 불가. 시군구 수준 통계(분당구.인천서구)를 사용. 이소크론 인구는 역 소재 시군구 전체 인구 합산 상한 추정치.",
+    "data_year_pop": 2024,
+    "data_year_worker": 2023,
+    "pangyo": {
+      "sigungu": "성남시 분당구",
+      "sigungu_pop": 447920,
+      "sigungu_workers": 360740,
+      "jjr_sigungu": 0.805,
+      "iso30_station_count": 86,
+      "iso30_sigungu_count": 6,
+      "iso30_est_pop": 1363127,
+      "iso60_station_count": 454,
+      "iso60_est_pop": 4089381,
+      "iso30_est_workers": 708826,
+      "iso60_est_workers": 2126478,
+      "employ_rate_note": "취업자/총인구=0.52 (2023 통계청 수도권 기준)",
+      "total_businesses": 47094,
+      "biz_by_industry": {
+        "제조업": 0.0,
+        "건설업": 0.0,
+        "도소매업": 2.3,
+        "숙박·음식점업": 0.0,
+        "기타서비스업": 0.0
+      },
+      "workers_by_industry": {
+        "제조업": 0.0,
+        "건설업": 0.0,
+        "도소매업": 2.8,
+        "숙박·음식점업": 0.2,
+        "기타서비스업": 0.1
+      }
+    },
+    "cheongna": {
+      "sigungu": "인천광역시 서구",
+      "sigungu_pop": 634066,
+      "sigungu_workers": 238937,
+      "jjr_sigungu": 0.377,
+      "iso30_station_count": 47,
+      "iso30_sigungu_count": 3,
+      "iso30_est_pop": 524000,
+      "iso60_station_count": 301,
+      "iso60_est_pop": 1572000,
+      "iso30_est_workers": 272480,
+      "iso60_est_workers": 817440,
+      "employ_rate_note": "취업자/총인구=0.52 (2023 통계청 수도권 기준)",
+      "total_businesses": 57576,
+      "biz_by_industry": {
+        "제조업": 0.0,
+        "건설업": 0.0,
+        "도소매업": 19.0,
+        "숙박·음식점업": 0.1,
+        "기타서비스업": 0.3
+      },
+      "workers_by_industry": {
+        "제조업": 0.0,
+        "건설업": 0.0,
+        "도소매업": 30.5,
+        "숙박·음식점업": 0.7,
+        "기타서비스업": 1.3
+      }
+    }
+  },
+  "station_area_ratio": {
+    "pangyo": {
+      "500m": 0.0,
+      "1000m": 31.2
+    },
+    "cheongna": {
+      "500m": 3.3,
+      "1000m": 10.2
+    },
+    "note": "역 500m/1km 버퍼 × zone 교차 면적 / zone 면적 (2026년 운영 역 기준)"
   }
 }

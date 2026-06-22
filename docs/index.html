@@ -3,231 +3,779 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>업무지구 성공과 실패 — 판교테크노밸리 vs 청라국제업무지구</title>
-
-<!-- Leaflet -->
+<title>판교 vs 청라 — 업무지구 입지 경쟁력 비교분석</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <style>
-/* ── 기본 ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Malgun Gothic','맑은 고딕',sans-serif; font-size: 14px; background:#f4f6f9; color:#222; }
-a { color:#2166ac; }
-
-/* ── 헤더 ── */
-header {
-  background: linear-gradient(135deg,#1a3a5c 0%,#2166ac 100%);
-  color:#fff; padding:16px 24px;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p:#1a54a0;--p-dark:#0c2a5e;--p-mid:#3a74c4;--p-light:#e5eef8;--p-xlight:#f0f6ff;
+  --c:#9e1a1a;--c-dark:#6b0e0e;--c-light:#fdeaea;
+  --gray0:#f4f6fb;--gray1:#f8f9fc;--gray2:#eaecf4;--gray3:#ced3e0;
+  --gray4:#8491aa;--gray5:#3d4866;--text:#2c3548;
+  --shadow-xs:0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm:0 2px 8px rgba(0,0,0,.08);
+  --shadow:0 4px 16px rgba(0,0,0,.10);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.15);
+  --radius:12px;--radius-sm:8px;
+  --sidebar-w:248px;
 }
-header h1 { font-size:20px; margin-bottom:4px; }
-header p  { font-size:12px; opacity:.85; }
+body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;font-size:13.5px;background:var(--gray0);color:var(--text);line-height:1.55}
 
-/* ── 탭 ── */
-.tabs { display:flex; background:#fff; border-bottom:2px solid #2166ac; }
-.tab-btn {
-  padding:10px 24px; cursor:pointer; border:none; background:none;
-  font-size:14px; color:#555; transition:all .2s;
+/* ── HEADER ── */
+header{
+  background:linear-gradient(135deg,#060f2a 0%,var(--p-dark) 50%,#1a54a0 100%);
+  color:#fff;padding:15px 28px 13px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  box-shadow:0 2px 16px rgba(0,0,0,.28);position:relative;z-index:10;
 }
-.tab-btn.active { color:#2166ac; font-weight:700; border-bottom:3px solid #2166ac; }
-.tab-btn:hover  { background:#f0f5ff; }
+.hdr-left{flex:1;min-width:0}
+.hdr-eyebrow{font-size:10.5px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;
+  opacity:.55;margin-bottom:3px}
+.hdr-left h1{font-size:18px;font-weight:800;letter-spacing:-.4px;line-height:1.2;
+  background:linear-gradient(90deg,#fff 70%,rgba(255,255,255,.7));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-sub{font-size:11px;opacity:.65;margin-top:4px;line-height:1.4}
+.hdr-badges{display:flex;flex-direction:column;gap:7px;flex-shrink:0}
+.badge{padding:5px 14px;border-radius:20px;font-size:11.5px;font-weight:700;
+  white-space:nowrap;letter-spacing:.2px;display:flex;align-items:center;gap:6px}
+.badge-p{background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.35);color:#fff}
+.badge-c{background:rgba(158,26,26,.55);border:1.5px solid rgba(255,255,255,.25);color:#fff}
+.badge-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.badge-p .badge-dot{background:#4fc3f7}
+.badge-c .badge-dot{background:#ef9a9a}
 
-.tab-panel { display:none; }
-.tab-panel.active { display:block; }
+/* ── TABS ── */
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--gray2);padding:0 20px;
+  box-shadow:0 1px 6px rgba(0,0,0,.07);position:sticky;top:0;z-index:9}
+.tab-btn{padding:11px 22px;cursor:pointer;border:none;background:none;font-size:13px;
+  font-weight:600;color:var(--gray4);border-bottom:2.5px solid transparent;
+  margin-bottom:-1px;transition:color .2s,border-color .2s;letter-spacing:.1px}
+.tab-btn.active{color:var(--p);border-bottom-color:var(--p)}
+.tab-btn:hover:not(.active){color:var(--gray5)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 
-/* ── 범례 배지 ── */
-.legend-row { display:flex; flex-wrap:wrap; gap:10px; padding:10px 16px; background:#fff; border-bottom:1px solid #e0e0e0; }
-.legend-item { display:flex; align-items:center; gap:5px; font-size:12px; }
-.legend-dot  { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+/* ══ MAP TAB ══ */
+.map-layout{display:flex;height:calc(100vh - 107px);min-height:480px}
 
-/* ── 지도 패널 ── */
-.map-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 16px; background:#fff; border-bottom:1px solid #ddd; }
-.map-controls label { font-size:13px; display:flex; align-items:center; gap:4px; cursor:pointer; }
-.map-controls select { font-size:13px; padding:3px 6px; border:1px solid #ccc; border-radius:4px; }
-
-.maps-container { display:grid; grid-template-columns:1fr 1fr; gap:4px; height:calc(100vh - 220px); min-height:450px; }
-.map-wrapper { position:relative; }
-.map-label {
-  position:absolute; top:10px; left:50%; transform:translateX(-50%);
-  z-index:1000; background:rgba(26,58,92,.85); color:#fff;
-  padding:4px 12px; border-radius:12px; font-size:13px; font-weight:700;
-  pointer-events:none;
+/* 사이드바 래퍼 (접기 애니메이션) */
+.sidebar-wrap{
+  width:var(--sidebar-w);flex-shrink:0;
+  transition:width .32s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+  position:relative;
 }
-.map-div { width:100%; height:100%; }
-#map-pangyo  { height:100%; }
-#map-cheongna { height:100%; }
+.sidebar-wrap.collapsed{width:0}
 
-/* ── 팝업 ── */
-.leaflet-popup-content { font-size:13px; min-width:160px; }
-.popup-title { font-weight:700; margin-bottom:6px; color:#1a3a5c; }
-.popup-row   { display:flex; justify-content:space-between; gap:8px; }
-.popup-label { color:#666; }
-.popup-val   { font-weight:600; }
+/* 사이드바 접기 그립 */
+.sidebar-grip{
+  width:18px;flex-shrink:0;
+  background:var(--gray2);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--gray4);transition:background .15s,color .15s;
+  position:relative;z-index:5;
+}
+.sidebar-grip:hover{background:var(--gray3);color:var(--p)}
+.grip-icon{
+  font-size:11px;line-height:1;
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  user-select:none;
+}
+.sidebar-wrap.collapsed~.sidebar-grip .grip-icon{transform:rotate(180deg)}
 
-/* ── 통계 패널 ── */
-.stats-panel { padding:20px; max-width:1200px; margin:0 auto; }
-.stats-grid  { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
-.stat-card   { background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,.1); }
-.stat-card h3 { font-size:14px; color:#1a3a5c; margin-bottom:12px; border-bottom:1px solid #e8eef7; padding-bottom:6px; }
-.chart-wrap  { position:relative; height:220px; }
-.kpi-grid    { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
-.kpi-box     { text-align:center; padding:10px; border-radius:6px; }
-.kpi-box.p  { background:#e8f2fc; }
-.kpi-box.c  { background:#fde8e8; }
-.kpi-label  { font-size:11px; color:#666; margin-bottom:4px; }
-.kpi-value  { font-size:18px; font-weight:700; }
-.kpi-box.p .kpi-value { color:#2166ac; }
-.kpi-box.c .kpi-value { color:#c0392b; }
-.kpi-sub    { font-size:11px; color:#888; }
+/* 사이드바 내부 */
+.map-sidebar{
+  width:var(--sidebar-w);height:100%;
+  background:#fff;border-right:1px solid var(--gray2);
+  overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;
+  scrollbar-width:thin;scrollbar-color:var(--gray3) transparent;
+}
+.map-sidebar::-webkit-scrollbar{width:4px}
+.map-sidebar::-webkit-scrollbar-thumb{background:var(--gray3);border-radius:2px}
 
-/* ── 비교표 ── */
-.compare-table { width:100%; border-collapse:collapse; font-size:13px; }
-.compare-table th { background:#eef3f9; color:#1a3a5c; padding:8px; text-align:left; }
-.compare-table td { padding:7px 8px; border-bottom:1px solid #f0f0f0; }
-.compare-table tr:hover td { background:#f7f9fc; }
-.badge-p { background:#2166ac; color:#fff; padding:1px 6px; border-radius:4px; font-size:11px; }
-.badge-c { background:#c0392b; color:#fff; padding:1px 6px; border-radius:4px; font-size:11px; }
+.sb-section{padding:14px 15px;border-bottom:1px solid var(--gray2)}
+.sb-title{
+  font-size:10px;font-weight:700;color:var(--gray4);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.sb-title-sub{font-size:9.5px;font-weight:400;text-transform:none;letter-spacing:0;opacity:.85}
 
-/* ── 접근성 패널 ── */
-.access-panel { padding:20px; max-width:1200px; margin:0 auto; }
-.access-grid  { display:grid; grid-template-columns:2fr 1fr; gap:20px; }
-@media(max-width:700px) { .access-grid { grid-template-columns:1fr; } .maps-container { grid-template-columns:1fr; } }
+/* 레이어 토글 버튼 */
+.sb-toggle{
+  display:flex;align-items:center;gap:9px;
+  width:100%;padding:8px 10px;margin-bottom:5px;
+  border:1.5px solid var(--gray2);border-radius:var(--radius-sm);
+  background:#fff;cursor:pointer;font-size:12.5px;color:var(--gray5);
+  transition:all .15s;text-align:left;font-family:inherit;
+}
+.sb-toggle:last-child{margin-bottom:0}
+.sb-toggle:hover{background:var(--gray1);border-color:var(--gray3)}
+.sb-toggle.active{background:var(--p-xlight);border-color:#a8c8f0;color:var(--p-dark);font-weight:600}
+.toggle-pill{
+  width:32px;height:17px;border-radius:9px;background:var(--gray3);
+  position:relative;flex-shrink:0;transition:background .2s;
+}
+.sb-toggle.active .toggle-pill{background:var(--p)}
+.toggle-pill::after{
+  content:"";position:absolute;top:2.5px;left:2.5px;
+  width:12px;height:12px;border-radius:50%;background:#fff;
+  transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.22);
+}
+.sb-toggle.active .toggle-pill::after{left:17.5px}
+
+/* 등시간권 슬라이더 */
+.iso-slider-wrap{padding:2px 0}
+.iso-slider-value-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:8px;
+}
+.iso-slider-label{font-size:11.5px;color:var(--gray4)}
+.iso-slider-value{font-size:16px;font-weight:800;color:var(--p)}
+.iso-slider{
+  width:100%;-webkit-appearance:none;appearance:none;
+  height:5px;border-radius:3px;outline:none;cursor:pointer;
+  background:linear-gradient(to right,var(--p) 50%,var(--gray3) 50%);
+  transition:background .1s;
+}
+.iso-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--p);border:2.5px solid #fff;
+  box-shadow:0 2px 6px rgba(26,84,160,.35);cursor:pointer;
+  transition:transform .1s,box-shadow .1s;
+}
+.iso-slider::-webkit-slider-thumb:hover{
+  transform:scale(1.15);box-shadow:0 3px 10px rgba(26,84,160,.45);
+}
+.iso-slider::-moz-range-thumb{
+  width:18px;height:18px;border-radius:50%;
+  background:var(--p);border:2.5px solid #fff;
+  box-shadow:0 2px 6px rgba(26,84,160,.35);cursor:pointer;
+}
+.iso-slider-ticks{
+  display:flex;justify-content:space-between;
+  font-size:10px;color:var(--gray4);margin-top:5px;
+}
+.iso-preset-btns{display:flex;gap:5px;margin-top:8px}
+.iso-preset{
+  flex:1;padding:4px 2px;border:1px solid var(--gray3);border-radius:5px;
+  background:#fff;font-size:11px;font-weight:600;color:var(--gray4);
+  cursor:pointer;text-align:center;transition:all .12s;font-family:inherit;
+}
+.iso-preset:hover{background:var(--p-light);border-color:#a8c8f0;color:var(--p)}
+.iso-preset.active{background:var(--p);border-color:var(--p);color:#fff}
+
+/* 지도 위 등시간권 스탯 오버레이 */
+.iso-overlay{
+  position:absolute;bottom:28px;right:10px;z-index:1000;
+  background:rgba(255,255,255,.93);border-radius:10px;
+  padding:9px 13px;font-size:11.5px;
+  box-shadow:0 2px 12px rgba(0,0,0,.18);
+  backdrop-filter:blur(4px);min-width:148px;pointer-events:none;
+  border-top:3px solid var(--gray3);
+}
+.iso-overlay.p{border-top-color:var(--p)}
+.iso-overlay.c{border-top-color:var(--c)}
+.iso-overlay-time{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--gray4);margin-bottom:6px;
+}
+.iso-overlay-row{
+  display:flex;justify-content:space-between;gap:10px;padding:2px 0;
+  border-bottom:1px solid var(--gray2);font-size:11.5px;
+}
+.iso-overlay-row:last-child{border-bottom:none}
+.iso-overlay-row span:first-child{color:var(--gray4)}
+.iso-overlay-row span:last-child{font-weight:700;color:var(--gray5)}
+.iso-overlay-note{font-size:9.5px;color:var(--gray4);margin-top:5px;line-height:1.4}
+
+/* 사이드바 범례 */
+.sb-legend-group-title{
+  font-size:10.5px;font-weight:700;color:var(--gray5);
+  margin-bottom:5px;margin-top:2px;
+}
+.sb-legend-item{display:flex;align-items:center;gap:6px;font-size:11.5px;padding:2px 0;color:var(--gray5)}
+.sb-legend-dot{width:11px;height:11px;border-radius:2px;flex-shrink:0;border:1px solid rgba(0,0,0,.08)}
+.sb-legend-sep{height:1px;background:var(--gray2);margin:8px 0}
+.sb-legend-iso-dot{width:14px;height:10px;border-radius:2px;background:#1a5fa8;opacity:.4;flex-shrink:0}
+
+/* 지도 영역 */
+.maps-area{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:3px;overflow:hidden;background:var(--gray2)}
+.map-wrapper{position:relative;background:#e8ecf2}
+.map-label{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;pointer-events:none}
+.map-label-inner{color:#fff;padding:5px 16px;border-radius:20px;font-size:13px;font-weight:700;
+  box-shadow:0 3px 10px rgba(0,0,0,.3);letter-spacing:.2px}
+.map-div{width:100%;height:100%}
+
+/* 팝업 */
+.leaflet-popup-content{font-size:13px;min-width:190px}
+.popup-title{font-weight:700;margin-bottom:7px;color:var(--p-dark);font-size:14px;
+  border-bottom:1px solid var(--gray2);padding-bottom:5px}
+.popup-row{display:flex;justify-content:space-between;gap:8px;padding:2.5px 0}
+.popup-label{color:var(--gray4);font-size:12px}
+.popup-val{font-weight:600;font-size:12.5px;color:var(--gray5)}
+
+/* ══ STATS TAB ══ */
+.stats-panel{padding:24px 26px;max-width:1400px;margin:0 auto}
+
+/* accordion */
+.accordion-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);
+  margin-bottom:24px;overflow:hidden;border:1px solid var(--gray2)}
+.accordion-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;cursor:pointer;user-select:none;
+  background:linear-gradient(90deg,var(--p-xlight),#fff);
+  border-bottom:1px solid var(--gray2);transition:background .2s;
+}
+.accordion-hdr:hover{background:linear-gradient(90deg,#d8e8f9,#f4f8ff)}
+.accordion-hdr h3{font-size:13.5px;color:var(--p-dark);font-weight:700;margin:0;letter-spacing:.1px}
+.accordion-arrow{font-size:14px;color:var(--p);transition:transform .28s;line-height:1}
+.accordion-arrow.open{transform:rotate(180deg)}
+.accordion-body{max-height:0;overflow:hidden;transition:max-height .38s ease}
+.accordion-body.open{max-height:2000px}
+.accordion-body-inner{padding:4px 0 10px}
+
+/* 섹션 헤더 */
+.section-hdr{
+  font-size:14px;font-weight:700;color:var(--p-dark);
+  margin:28px 0 15px;padding:10px 18px;
+  background:linear-gradient(90deg,var(--p-light),var(--p-xlight));
+  border-left:4px solid var(--p);border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  display:flex;align-items:center;gap:8px;letter-spacing:.1px;
+}
+
+/* 카드 그리드 */
+.stat-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.stat-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
+.stat-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+.card{
+  background:#fff;border-radius:var(--radius);padding:18px;
+  box-shadow:var(--shadow-xs);border:1px solid var(--gray2);
+  transition:box-shadow .2s;
+}
+.card:hover{box-shadow:var(--shadow-sm)}
+.card h3{
+  font-size:12.5px;color:var(--p-dark);margin-bottom:13px;
+  padding-bottom:8px;border-bottom:1px solid var(--gray2);font-weight:700;
+}
+.chart-wrap{position:relative;height:200px}
+.chart-wrap.tall{height:280px}
+.chart-wrap.short{height:150px}
+.chart-wrap.line{height:300px}
+
+/* 수치 카드 */
+.metric-card{
+  background:#fff;border-radius:var(--radius);padding:15px 16px;
+  box-shadow:var(--shadow-xs);border:1px solid var(--gray2);
+  text-align:center;position:relative;overflow:hidden;
+  transition:box-shadow .2s,transform .2s;
+}
+.metric-card:hover{box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+.metric-card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gray3);
+}
+.metric-card.p::before{background:linear-gradient(90deg,var(--p),var(--p-mid))}
+.metric-card.c::before{background:linear-gradient(90deg,var(--c),#c53030)}
+.metric-card.both::before{background:linear-gradient(90deg,var(--p) 50%,var(--c) 50%)}
+.metric-title{
+  font-size:10.5px;color:var(--gray4);font-weight:700;
+  margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px;line-height:1.35;
+}
+.metric-row{display:flex;justify-content:center;gap:22px;align-items:baseline;margin-bottom:5px}
+.metric-val-p{font-size:22px;font-weight:800;color:var(--p);letter-spacing:-.5px}
+.metric-val-c{font-size:22px;font-weight:800;color:var(--c);letter-spacing:-.5px}
+.metric-label{font-size:10px;color:var(--gray4);margin-top:2px}
+.metric-sub{font-size:10.5px;color:var(--gray4);margin-top:6px;line-height:1.4}
+
+/* 비교표 */
+.cmp-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.cmp-table th{background:var(--gray1);color:var(--p-dark);padding:8px 11px;
+  text-align:left;font-size:12px;border-bottom:2px solid var(--gray2);font-weight:700}
+.cmp-table td{padding:7px 11px;border-bottom:1px solid var(--gray2)}
+.cmp-table tr:hover td{background:var(--p-xlight)}
+.cmp-table .td-p{color:var(--p);font-weight:700}
+.cmp-table .td-c{color:var(--c);font-weight:700}
+.cmp-table .td-note{color:var(--gray4);font-size:11px}
+.bdg-p{display:inline-block;background:var(--p);color:#fff;padding:2.5px 10px;
+  border-radius:5px;font-size:11px;font-weight:700;letter-spacing:.1px}
+.bdg-c{display:inline-block;background:var(--c);color:#fff;padding:2.5px 10px;
+  border-radius:5px;font-size:11px;font-weight:700;letter-spacing:.1px}
+.src-note{font-size:11px;color:var(--gray4);margin-top:7px;line-height:1.5}
+.meta-banner{
+  background:linear-gradient(135deg,#fffbf0,#fff8e6);
+  border:1px solid #f0d58c;border-radius:var(--radius);
+  padding:14px 18px;font-size:11.5px;color:#7a5a00;line-height:1.65;margin-top:28px;
+}
+.meta-banner strong{color:#5a4000}
+
+/* META TAB */
+.meta-panel{padding:24px 26px;max-width:1000px;margin:0 auto}
+.meta-panel .card{margin-bottom:18px}
+.meta-panel h3{font-size:14px;color:var(--p-dark);margin-bottom:10px;
+  padding-bottom:6px;border-bottom:1px solid var(--gray2);font-weight:700}
+.meta-panel table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.meta-panel th{background:var(--gray1);padding:7px 11px;text-align:left;
+  border-bottom:2px solid var(--gray2);color:var(--p-dark);font-size:12px;font-weight:700}
+.meta-panel td{padding:6px 11px;border-bottom:1px solid var(--gray2);vertical-align:top;color:var(--text)}
+
+@media(max-width:900px){
+  .sidebar-wrap{--sidebar-w:190px}
+  .maps-area{grid-template-columns:1fr}
+  .stat-grid-2,.stat-grid-3,.stat-grid-4{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .sidebar-wrap{display:none}
+  .sidebar-grip{display:none}
+  .stat-grid-2,.stat-grid-3,.stat-grid-4{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>데이터로 진단하는 업무지구의 성공과 실패</h1>
-  <p>판교테크노밸리(경기도 성남시 분당구 삼평동) vs 청라국제업무지구(인천광역시 서구 청라동) — 2024년 기준 공공데이터 비교분석</p>
+  <div class="hdr-left">
+    <div class="hdr-eyebrow">Smart City · Urban Analysis Dashboard</div>
+    <h1>판교테크노밸리 vs 청라국제업무지구</h1>
+    <div class="hdr-sub">업무지구 입지 경쟁력 비교분석 &nbsp;|&nbsp; 건축물대장 · 지하철 네트워크 · SGIS 집계구 통계 기반 정량 분석</div>
+  </div>
+  <div class="hdr-badges">
+    <span class="badge badge-p"><span class="badge-dot"></span>✓ 판교테크노밸리 (성공)</span>
+    <span class="badge badge-c"><span class="badge-dot"></span>✗ 청라국제업무지구 (부진)</span>
+  </div>
 </header>
 
-<!-- 탭 -->
 <div class="tabs">
   <button class="tab-btn active" data-tab="map">🗺️ 지도 비교</button>
-  <button class="tab-btn" data-tab="stats">📊 통계 패널</button>
-  <button class="tab-btn" data-tab="access">🚇 교통 접근성</button>
+  <button class="tab-btn" data-tab="stats">📊 통계 분석</button>
+  <button class="tab-btn" data-tab="meta">📋 분석 메타데이터</button>
 </div>
 
-<!-- ═══ 지도 탭 ═══ -->
+<!-- ══════════════════════════════════════════════════════
+     TAB 1: 지도 비교
+══════════════════════════════════════════════════════ -->
 <div class="tab-panel active" id="tab-map">
-  <!-- 범례 -->
-  <div class="legend-row" id="use-legend"></div>
+<div class="map-layout">
 
-  <!-- 컨트롤 -->
-  <div class="map-controls">
-    <strong style="margin-right:4px">레이어:</strong>
-    <label><input type="checkbox" id="chk-zone" checked> 구역경계</label>
-    <label><input type="checkbox" id="chk-bldg" checked> 건축물 용도</label>
-    <label><input type="checkbox" id="chk-iso30"> 등시간권 30분</label>
-    <label><input type="checkbox" id="chk-iso60"> 등시간권 60분</label>
-    <label><input type="checkbox" id="chk-station"> 도달 지하철역</label>
-    <span style="margin-left:auto;font-size:12px;color:#888">베이스맵: OpenStreetMap</span>
+  <!-- 사이드바 래퍼 -->
+  <div class="sidebar-wrap" id="sidebar-wrap">
+    <aside class="map-sidebar" id="map-sidebar">
+
+      <!-- 레이어 -->
+      <div class="sb-section">
+        <div class="sb-title">레이어</div>
+        <button class="sb-toggle active" id="tog-zoning">
+          <span class="toggle-pill"></span> 용도지역
+        </button>
+        <button class="sb-toggle active" id="tog-bldg">
+          <span class="toggle-pill"></span> 건축물 용도
+        </button>
+        <button class="sb-toggle" id="tog-road">
+          <span class="toggle-pill"></span> 도로망
+        </button>
+        <button class="sb-toggle" id="tog-station">
+          <span class="toggle-pill"></span> 도달역
+        </button>
+      </div>
+
+      <!-- 등시간권 슬라이더 -->
+      <div class="sb-section">
+        <div class="sb-title">등시간권 <span class="sb-title-sub">(지하철 네트워크)</span></div>
+        <div class="iso-slider-wrap">
+          <div class="iso-slider-value-row">
+            <span class="iso-slider-label">소요 시간</span>
+            <span class="iso-slider-value"><span id="iso-cur-val">30</span>분</span>
+          </div>
+          <input type="range" id="iso-slider" class="iso-slider" min="5" max="60" step="5" value="30">
+          <div class="iso-slider-ticks">
+            <span>5분</span><span>15분</span><span>30분</span><span>45분</span><span>60분</span>
+          </div>
+          <div class="iso-preset-btns">
+            <button class="iso-preset" data-val="15">15분</button>
+            <button class="iso-preset active" data-val="30">30분</button>
+            <button class="iso-preset" data-val="45">45분</button>
+            <button class="iso-preset" data-val="60">60분</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 범례 -->
+      <div class="sb-section" style="flex:1">
+        <div class="sb-title">범례</div>
+        <div class="sb-legend-group-title">건축물 용도</div>
+        <div id="sb-legend-bldg"></div>
+        <div class="sb-legend-sep"></div>
+        <div class="sb-legend-group-title">용도지역</div>
+        <div id="sb-legend-zoning"></div>
+        <div class="sb-legend-sep"></div>
+        <div class="sb-legend-item">
+          <span class="sb-legend-iso-dot"></span>
+          <span>등시간권 (지하철)</span>
+        </div>
+      </div>
+
+    </aside>
   </div>
 
-  <!-- 지도 -->
-  <div class="maps-container">
+  <!-- 접기 그립 -->
+  <button class="sidebar-grip" id="sidebar-toggle" title="사이드바 접기/펼치기">
+    <span class="grip-icon">◀</span>
+  </button>
+
+  <!-- 지도 영역 -->
+  <div class="maps-area">
     <div class="map-wrapper">
-      <div class="map-label">🏢 판교테크노밸리</div>
+      <div class="map-label">
+        <div class="map-label-inner" style="background:rgba(12,42,94,.9)">🏢 판교테크노밸리</div>
+      </div>
       <div id="map-pangyo" class="map-div"></div>
+      <div class="iso-overlay p" id="iso-overlay-p">
+        <div class="iso-overlay-time" id="iso-time-p">30분권 등시간권</div>
+        <div class="iso-overlay-row"><span>도달 역수</span><span id="ip-sta">—</span></div>
+        <div class="iso-overlay-row"><span>추정 총인구</span><span id="ip-pop">—</span></div>
+        <div class="iso-overlay-row"><span>추정 종사자</span><span id="ip-wrk">—</span></div>
+        <div class="iso-overlay-note">집계구 공간조인 기반 · 종사자는 취업률 52% 적용 추정</div>
+      </div>
     </div>
     <div class="map-wrapper">
-      <div class="map-label">🏗️ 청라국제업무지구</div>
+      <div class="map-label">
+        <div class="map-label-inner" style="background:rgba(107,14,14,.9)">🏗️ 청라국제업무지구</div>
+      </div>
       <div id="map-cheongna" class="map-div"></div>
+      <div class="iso-overlay c" id="iso-overlay-c">
+        <div class="iso-overlay-time" id="iso-time-c">30분권 등시간권</div>
+        <div class="iso-overlay-row"><span>도달 역수</span><span id="ic-sta">—</span></div>
+        <div class="iso-overlay-row"><span>추정 총인구</span><span id="ic-pop">—</span></div>
+        <div class="iso-overlay-row"><span>추정 종사자</span><span id="ic-wrk">—</span></div>
+        <div class="iso-overlay-note">집계구 공간조인 기반 · 종사자는 취업률 52% 적용 추정</div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- ═══ 통계 탭 ═══ -->
+</div>
+</div><!-- /tab-map -->
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 2: 통계 분석
+══════════════════════════════════════════════════════ -->
 <div class="tab-panel" id="tab-stats">
 <div class="stats-panel">
 
-  <!-- KPI 요약 -->
-  <div class="stat-card" style="margin-bottom:20px">
-    <h3>핵심 지표 비교</h3>
-    <table class="compare-table" id="kpi-table">
-      <thead><tr><th>지표</th><th><span class="badge-p">판교테크노밸리</span></th><th><span class="badge-c">청라국제업무지구</span></th><th>비고</th></tr></thead>
-      <tbody id="kpi-tbody"></tbody>
+  <!-- 핵심 지표 비교표 (accordion) -->
+  <div class="accordion-wrap">
+    <div class="accordion-hdr" id="acc-hdr">
+      <h3>📋 핵심 지표 비교표 (클릭하여 펼치기)</h3>
+      <span class="accordion-arrow" id="acc-arrow">▼</span>
+    </div>
+    <div class="accordion-body" id="acc-body">
+      <div class="accordion-body-inner">
+        <table class="cmp-table" id="kpi-table">
+          <thead><tr>
+            <th>영역</th><th>지표</th>
+            <th><span class="bdg-p">판교테크노밸리</span></th>
+            <th><span class="bdg-c">청라국제업무지구</span></th>
+            <th>비고</th>
+          </tr></thead>
+          <tbody id="kpi-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-1 토지이용 -->
+  <div class="section-hdr">🏗️ 3-1 토지이용 (Land Use)</div>
+
+  <div class="stat-grid-4" style="margin-bottom:16px">
+    <div class="metric-card both">
+      <div class="metric-title">토지이용 혼합도<br>(LUM 엔트로피)</div>
+      <div class="metric-row">
+        <div><div class="metric-val-p" id="m-lum-p">—</div><div class="metric-label">판교</div></div>
+        <div><div class="metric-val-c" id="m-lum-c">—</div><div class="metric-label">청라</div></div>
+      </div>
+      <div class="metric-sub">0 = 단일용도 · 1 = 완전혼합</div>
+    </div>
+    <div class="metric-card both">
+      <div class="metric-title">개발 실현 정도<br>(평균 용적률)</div>
+      <div class="metric-row">
+        <div><div class="metric-val-p" id="m-far-p">—</div><div class="metric-label">판교</div></div>
+        <div><div class="metric-val-c" id="m-far-c">—</div><div class="metric-label">청라</div></div>
+      </div>
+      <div class="metric-sub">연면적 ÷ 대지면적</div>
+    </div>
+    <div class="metric-card p">
+      <div class="metric-title">업무+교육연구 비율<br>(연면적 기준)</div>
+      <div class="metric-row">
+        <div><div class="metric-val-p" id="m-wk-p">—</div><div class="metric-label">판교</div></div>
+        <div><div class="metric-val-c" id="m-wk-c">—</div><div class="metric-label">청라</div></div>
+      </div>
+      <div class="metric-sub">업무지구 핵심 용도 집중도</div>
+    </div>
+    <div class="metric-card both">
+      <div class="metric-title">용도지역 1위<br>(면적 기준)</div>
+      <div style="margin-top:7px">
+        <div style="font-size:12px;color:var(--p);font-weight:700" id="m-zone-p">—</div>
+        <div style="font-size:10px;color:var(--gray4);margin-bottom:9px" id="m-zone-pp">—</div>
+        <div style="font-size:12px;color:var(--c);font-weight:700" id="m-zone-c">—</div>
+        <div style="font-size:10px;color:var(--gray4)" id="m-zone-cp">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-grid-3" style="margin-bottom:6px">
+    <div class="card">
+      <h3>용도지역 구성 — 판교 (면적 기준)</h3>
+      <div class="chart-wrap"><canvas id="pie-zone-p"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>용도지역 구성 — 청라 (면적 기준)</h3>
+      <div class="chart-wrap"><canvas id="pie-zone-c"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>용도지역 나란히 비교 (%)</h3>
+      <div class="chart-wrap tall"><canvas id="bar-zone"></canvas></div>
+    </div>
+  </div>
+  <p class="src-note" style="margin:0 0 14px 4px">출처: PROM = 국토지리정보원 VWorld 도시계획·용도지역 (2026년 6월) · 공간단위: 용도지역 폴리곤(필지 단위), 구역 내 교차 면적 기준</p>
+
+  <div class="stat-grid-3" style="margin-bottom:6px">
+    <div class="card">
+      <h3>건축물 주용도 구성 — 판교 (연면적)</h3>
+      <div class="chart-wrap"><canvas id="pie-pangyo"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>건축물 주용도 구성 — 청라 (연면적)</h3>
+      <div class="chart-wrap"><canvas id="pie-cheongna"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>주용도 비율 나란히 비교 (%)</h3>
+      <div class="chart-wrap tall"><canvas id="bar-use"></canvas></div>
+    </div>
+  </div>
+  <p class="src-note" style="margin:0 0 20px 4px">출처: PROM 건축물현황정보 (2026년 6월) · 공간단위: 건축물(동), 건축법상 주용도 분류</p>
+
+  <!-- 3-2 교통망 -->
+  <div class="section-hdr">🚇 3-2 교통망 (Transport) — 지하철 네트워크 기반 등시간권 분석</div>
+  <div class="stat-grid-2" style="margin-bottom:6px">
+    <div class="card">
+      <h3>누적 접근성 곡선 — t분 이내 도달 가능 역 수</h3>
+      <div class="chart-wrap line"><canvas id="line-access"></canvas></div>
+      <p class="src-note">※ 지하철 네트워크 기반 · 환승 대기시간 포함 최단경로 · subway_network.zip (2026-05)</p>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:18px">
+        <h3>30분·60분 등시간권 역 수 비교</h3>
+        <div class="chart-wrap short"><canvas id="bar-iso"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>30분권 추정 인구·경제활동인구 비교</h3>
+        <div class="chart-wrap"><canvas id="bar-iso-pop"></canvas></div>
+        <p class="src-note">경제활동인구 = 총인구 × 0.52 · 집계구 공간조인 기반 추정치 (SGIS 2024)</p>
+      </div>
+    </div>
+  </div>
+  <div class="stat-grid-3" style="margin-bottom:6px">
+    <div class="card">
+      <h3>도로망 밀도 비교 (km/km²)</h3>
+      <div class="chart-wrap short"><canvas id="bar-road"></canvas></div>
+      <p class="src-note">출처: OpenStreetMap (2026년 6월)</p>
+    </div>
+    <div class="card">
+      <h3>구역 ↔ 핵심역 직선 거리</h3>
+      <table class="cmp-table" style="font-size:12px;margin-top:6px">
+        <tr><th></th><th><span class="bdg-p">판교</span></th><th><span class="bdg-c">청라</span></th></tr>
+        <tr><td>역 위치</td><td class="td-p">구역 <b>외부</b></td><td class="td-c">구역 <b>내부</b></td></tr>
+        <tr><td>경계→역 거리</td><td class="td-p">~588 m</td><td class="td-c">구역 내부</td></tr>
+        <tr><td>중심→역 거리</td><td class="td-p">~1,118 m</td><td class="td-c">~349 m</td></tr>
+        <tr><td>보행 접근</td><td>도보 약 7~9분</td><td>구역 내 위치</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>핵심역 정보</h3>
+      <table class="cmp-table" style="font-size:12px">
+        <tr><th></th><th><span class="bdg-p">판교</span></th><th><span class="bdg-c">청라</span></th></tr>
+        <tr><td>핵심역</td><td class="td-p">판교역</td><td class="td-c">청라국제도시역</td></tr>
+        <tr><td>노선</td><td>신분당선</td><td>공항철도(AREX)</td></tr>
+        <tr><td>개통일</td><td>2011-10-28</td><td>2014-06-21</td></tr>
+        <tr><td>강남까지</td><td>~15분</td><td>~50분(환승)</td></tr>
+        <tr><td>30분권 역수</td><td class="td-p" id="acc-p30">—</td><td class="td-c" id="acc-c30">—</td></tr>
+        <tr><td>60분권 역수</td><td class="td-p" id="acc-p60">—</td><td class="td-c" id="acc-c60">—</td></tr>
+        <tr><td>30분 추정인구</td><td class="td-p" id="acc-pp30">—</td><td class="td-c" id="acc-cp30">—</td></tr>
+        <tr><td>30분 추정경활인구</td><td class="td-p" id="acc-ppw30">—</td><td class="td-c" id="acc-cpw30">—</td></tr>
+      </table>
+    </div>
+  </div>
+  <p class="src-note" style="margin:0 0 24px 4px">등시간권: subway_network.zip(최단경로) + SGIS 집계구 인구통계(2024년) 공간조인 기반 · 종사자는 취업률 52% 적용 추정</p>
+
+  <!-- 3-3 인구사회 -->
+  <div class="section-hdr">👥 3-3 인구사회 (Socio-demographics)</div>
+
+  <div class="stat-grid-4" style="margin-bottom:16px">
+    <div class="metric-card p">
+      <div class="metric-title">구역 내 상주인구</div>
+      <div class="metric-row">
+        <div><div class="metric-val-p" id="m-pop-p">—</div><div class="metric-label">판교</div></div>
+        <div><div class="metric-val-c" id="m-pop-c">—</div><div class="metric-label">청라</div></div>
+      </div>
+      <div class="metric-sub">집계구 합산 · 2024년</div>
+    </div>
+    <div class="metric-card both">
+      <div class="metric-title">구역 내 가구수</div>
+      <div class="metric-row">
+        <div><div class="metric-val-p" id="m-hh-p">—</div><div class="metric-label">판교</div></div>
+        <div><div class="metric-val-c" id="m-hh-c">—</div><div class="metric-label">청라</div></div>
+      </div>
+      <div class="metric-sub">집계구 합산 · 2024년</div>
+    </div>
+    <div class="metric-card both">
+      <div class="metric-title">구역 내 사업체수</div>
+      <div class="metric-row">
+        <div><div class="metric-val-p" id="m-biz-p">—</div><div class="metric-label">판교</div></div>
+        <div><div class="metric-val-c" id="m-biz-c">—</div><div class="metric-label">청라</div></div>
+      </div>
+      <div class="metric-sub">집계구 합산 · 2023년</div>
+    </div>
+    <div class="metric-card both">
+      <div class="metric-title">직주비<br>(종사자 / 상주인구)</div>
+      <div class="metric-row">
+        <div><div class="metric-val-p" id="m-jjr-p">—</div><div class="metric-label">판교(분당구)</div></div>
+        <div><div class="metric-val-c" id="m-jjr-c">—</div><div class="metric-label">청라(서구)</div></div>
+      </div>
+      <div class="metric-sub">&gt;1 = 종사자 유입형 · 시군구 기준</div>
+    </div>
+  </div>
+
+  <div class="stat-grid-2" style="margin-bottom:6px">
+    <div class="card">
+      <h3>업종별 사업체 구성비 — 10대 대분류 (%)</h3>
+      <div class="chart-wrap tall" style="height:320px"><canvas id="bar-biz-ind"></canvas></div>
+      <p class="src-note">출처: SGIS 집계구별 사업체 수 (10차 산업분류 대분류, 2023년) · 구역 내 집계구 합산 (판교 3개·청라 67개)</p>
+    </div>
+    <div class="card">
+      <h3>직주비 (종사자수 / 상주인구)</h3>
+      <div class="chart-wrap"><canvas id="bar-jjr"></canvas></div>
+      <p class="src-note" style="margin-top:6px">직주비 &gt; 1.0 = 종사자 유입형(job-rich) · 시군구(분당구/인천서구) 단위 산출</p>
+    </div>
+  </div>
+  <p class="src-note" style="margin:0 0 4px 4px">인구·가구: SGIS 집계구 합산(2024년) · 사업체: SGIS 집계구별 사업체 수(2023년) · 직주비: 시군구 기준</p>
+
+  <!-- 공간단위 안내 (하단) -->
+  <div class="meta-banner">
+    <strong>📐 공간 단위 처리 안내</strong><br>
+    • 건축물·용도지역: PROM 폴리곤, 건축물은 대표점(representative_point) 기준으로 구역 포함 여부 결정 / 용도지역은 필지 단위(국토계획법), 건축물 용도는 건축물 단위(건축법)<br>
+    • 인구·가구·사업체(구역 내): SGIS 집계구 경계(2025년 2분기) × 구역 폴리곤 공간필터 → <b>구역 내 집계구 합산</b> (판교 3개·청라 67개)<br>
+    • 등시간권: <b>지하철 네트워크 전용</b>(버스·도보 제외). 이소크론 폴리곤(역 500m 버퍼 합집합) × 집계구 대표점 공간조인 → 해당 집계구 총인구 합산 (SGIS 2024)<br>
+    • 용도지역 색상: 국토부 도시계획 색상 기준 참고하여 설정 (공식 기준과 일부 상이할 수 있음)
+  </div>
+
+</div>
+</div><!-- /tab-stats -->
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 3: 분석 메타데이터
+══════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-meta">
+<div class="meta-panel">
+
+  <div class="card">
+    <h3>📍 구역계 정의</h3>
+    <table>
+      <tr><th>항목</th><th>판교테크노밸리</th><th>청라국제업무지구</th></tr>
+      <tr><td>구역 정의</td><td>판교테크노밸리 제1단지 사업지구 경계 (PROM 구역계 직접 설정)</td><td>인천경제자유구역 청라지구 중 호수공원 좌측 업무·상업·주거 복합지구 (PROM 구역계 직접 설정)</td></tr>
+      <tr><td>면적</td><td id="meta-area-p">—</td><td id="meta-area-c">—</td></tr>
+      <tr><td>건축물 수</td><td id="meta-bldg-p">—</td><td id="meta-bldg-c">—</td></tr>
+      <tr><td>출처</td><td colspan="2">공간정보 오픈플랫폼(PROM) 구역계 설정 2026-06</td></tr>
     </table>
   </div>
 
-  <div class="stats-grid">
-    <!-- 건축물 주용도 파이 -->
-    <div class="stat-card">
-      <h3>건축물 주용도 구성비 (연면적 기준)</h3>
-      <div class="chart-wrap"><canvas id="pie-pangyo"></canvas></div>
-      <p style="text-align:center;font-size:12px;color:#666;margin-top:6px"><span class="badge-p">판교테크노밸리</span></p>
-    </div>
-    <div class="stat-card">
-      <h3>건축물 주용도 구성비 (연면적 기준)</h3>
-      <div class="chart-wrap"><canvas id="pie-cheongna"></canvas></div>
-      <p style="text-align:center;font-size:12px;color:#666;margin-top:6px"><span class="badge-c">청라국제업무지구</span></p>
-    </div>
-
-    <!-- 주요 지표 막대 -->
-    <div class="stat-card" style="grid-column:span 2">
-      <h3>주요 지표 나란히 비교</h3>
-      <div class="chart-wrap" style="height:280px"><canvas id="bar-compare"></canvas></div>
-    </div>
+  <div class="card">
+    <h3>📊 데이터 출처 및 기준연도</h3>
+    <table>
+      <tr><th>데이터</th><th>출처</th><th>기준연도/월</th><th>공간단위</th></tr>
+      <tr><td>용도지역 구성비</td><td>공간정보 오픈플랫폼(PROM) = VWorld 국토지리정보원, 도시계획·용도지역</td><td>2026년 6월</td><td>용도지역 폴리곤 (필지 단위)</td></tr>
+      <tr><td>건축물 주용도·연면적·용적률</td><td>공간정보 오픈플랫폼(PROM) 건축물현황정보</td><td>2026년 6월</td><td>건축물(동)</td></tr>
+      <tr><td>구역계(경계)</td><td>PROM 구역계 직접 설정</td><td>2026년 6월</td><td>구역 폴리곤</td></tr>
+      <tr><td>지하철 네트워크·이소크론</td><td>subway_network.zip (최단경로 다익스트라, <b>지하철 전용</b>)</td><td>2026년 5월</td><td>역(노드)</td></tr>
+      <tr><td>등시간권 추정 인구·종사자</td><td>SGIS 집계구 인구통계 × 이소크론 폴리곤 공간조인 (Script 12)</td><td>2024년</td><td>집계구</td></tr>
+      <tr><td>집계구 인구·가구</td><td>SGIS 통계지리정보서비스 집계구 단위 인구·가구통계</td><td>2024년</td><td>집계구 → 구역 내 합산</td></tr>
+      <tr><td>종사자·사업체</td><td>SGIS 집계구별 사업체 수 (전국사업체조사)</td><td>2023년</td><td>집계구 → 구역 내 합산</td></tr>
+      <tr><td>도로망</td><td>OpenStreetMap (osmnx 다운로드)</td><td>2026년 6월</td><td>도로 구간(edge)</td></tr>
+    </table>
   </div>
-</div>
-</div>
 
-<!-- ═══ 접근성 탭 ═══ -->
-<div class="tab-panel" id="tab-access">
-<div class="access-panel">
-  <div class="access-grid">
-    <div class="stat-card">
-      <h3>누적 접근성 곡선 — 역 수 기준 (출발역에서 t분 이내 도달 역 수)</h3>
-      <div class="chart-wrap" style="height:320px"><canvas id="line-access"></canvas></div>
-      <p style="font-size:12px;color:#888;margin-top:8px">
-        판교역(신분당선) vs 청라국제도시역(공항철도) 기준. 환승 대기시간 포함.
-        집계구 shapefile 미확보로 인구 기준 전환 불가 — 역 수 기준 제시.
-      </p>
-    </div>
-    <div>
-      <div class="stat-card" style="margin-bottom:16px">
-        <h3>등시간권 역수 비교</h3>
-        <div class="chart-wrap" style="height:180px"><canvas id="bar-iso"></canvas></div>
-      </div>
-      <div class="stat-card">
-        <h3>핵심역 정보</h3>
-        <table class="compare-table">
-          <tr><th></th><th><span class="badge-p">판교</span></th><th><span class="badge-c">청라</span></th></tr>
-          <tr><td>핵심역</td><td>판교역</td><td>청라국제도시역</td></tr>
-          <tr><td>노선</td><td>신분당선</td><td>공항철도(AREX)</td></tr>
-          <tr><td>개통</td><td>2011-10-28</td><td>2014-06-21</td></tr>
-          <tr><td>강남역까지</td><td>~15분</td><td>~50분(환승)</td></tr>
-          <tr><td>서울역까지</td><td>~35분</td><td>~35분</td></tr>
-        </table>
-        <p style="font-size:11px;color:#888;margin-top:8px">
-          공항철도는 서울역 방향이 주 노선으로, 강남·여의도 방향 접근성 불리.
-        </p>
-      </div>
-    </div>
+  <div class="card">
+    <h3>⚠️ 공간 단위 통합 방법 및 한계</h3>
+    <table>
+      <tr><th>이슈</th><th>처리 방법</th><th>한계</th></tr>
+      <tr><td>구역계 ≠ 집계구 경계</td><td>SGIS 집계구 경계 SHP × 구역 폴리곤 공간필터 → 구역 내 집계구 합산</td><td>집계구 경계가 구역 경계와 완전히 일치하지 않아 경계부 오차 가능</td></tr>
+      <tr><td>건축물 구역 포함 기준</td><td>건축물 폴리곤의 representative_point가 구역 폴리곤 내부에 있으면 포함</td><td>경계 걸친 건축물은 중심점 기준; 면적 비례 배분 미적용</td></tr>
+      <tr><td>등시간권 인구 추정</td><td>이소크론 폴리곤(역 500m 버퍼 합집합) × 집계구 대표점 within 필터 → 해당 집계구 총인구 합산 · 종사자 = 총인구 × 0.52</td><td>경계부 집계구 오차 가능 · 종사자는 취업률(52%) 추정치 · 도보 이동 미반영</td></tr>
+      <tr><td>경제활동인구 추정</td><td>총인구 × 0.52 (수도권 취업자/총인구 비율, 2023 통계청)</td><td>시군구별 취업률 차이 무시</td></tr>
+      <tr><td>업종별 사업체 비율</td><td>SGIS 집계구 cp_bnu_001~019 × 구역 내 집계구 필터 → Long format pivot 합산</td><td>집계구 내 세부 위치 구분 불가</td></tr>
+    </table>
   </div>
+
+  <div class="card">
+    <h3>🔬 분석 시간·공간 범위</h3>
+    <table>
+      <tr><th>구분</th><th>내용</th></tr>
+      <tr><td>분석 시간 범위</td><td>건축물: 2026년 6월 · 인구·가구: 2024년 · 종사자·사업체: 2023년 · 지하철 네트워크: 2026년 5월</td></tr>
+      <tr><td>분석 공간 범위</td><td>판교테크노밸리 제1단지 + 청라국제도시 호수공원 좌측 업무·상업 지구</td></tr>
+      <tr><td>공간 단위</td><td>건축물(동) / 집계구 / 시군구 / 역(노드) — 영역별 상이</td></tr>
+      <tr><td>이소크론 분석</td><td>지하철 최단경로(다익스트라) 기반, 환승 대기시간 포함, 버스·도보 제외</td></tr>
+    </table>
+  </div>
+
 </div>
-</div>
+</div><!-- /tab-meta -->
 
 <script src="js/main.js"></script>
 <script src="js/charts.js"></script>
-
 <script>
-// ── 탭 전환 ──────────────────────────────────────────────────────────
+// 탭 전환
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
     document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
-    // 지도 탭으로 돌아올 때 크기 재조정
-    if (btn.dataset.tab === "map" && window.mapPangyo) {
-      setTimeout(() => { window.mapPangyo.invalidateSize(); window.mapCheongna.invalidateSize(); }, 50);
+    if (btn.dataset.tab === "map") {
+      setTimeout(() => { window.mapPangyo?.invalidateSize(); window.mapCheongna?.invalidateSize(); }, 60);
     }
   });
 });
+
+// 사이드바 접기/펼치기
+(function() {
+  const wrap = document.getElementById("sidebar-wrap");
+  const btn  = document.getElementById("sidebar-toggle");
+  if (!wrap || !btn) return;
+  btn.addEventListener("click", () => {
+    wrap.classList.toggle("collapsed");
+    setTimeout(() => {
+      window.mapPangyo?.invalidateSize();
+      window.mapCheongna?.invalidateSize();
+    }, 340);
+  });
+})();
+
+// accordion 비교표
+(function() {
+  const hdr  = document.getElementById("acc-hdr");
+  const body = document.getElementById("acc-body");
+  const arr  = document.getElementById("acc-arrow");
+  if (!hdr) return;
+  hdr.addEventListener("click", () => {
+    const open = body.classList.toggle("open");
+    arr.classList.toggle("open", open);
+    hdr.querySelector("h3").textContent = open
+      ? "📋 핵심 지표 비교표 (클릭하여 접기)"
+      : "📋 핵심 지표 비교표 (클릭하여 펼치기)";
+  });
+})();
 </script>
 </body>
 </html>
